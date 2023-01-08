@@ -30,3 +30,7 @@ Within the folder you can find multiple files for each problem. The `*.ipynb` fi
 in your browser. The `*.py` files are the python scripts that are used to provide the implementation details for the
 notebooks. You can open them in your favorite text editor or IDE. The `_test.py` files are used to test the 
 implementation of the `*.py` files. They are not required to use the notebooks.
+
+### Virtual environment
+
+Pipenv users may install all dependencies with `pipenv install`. Remember to select the proper runtime for scripts and notebooks via `pipenv shell` or your IDE.
