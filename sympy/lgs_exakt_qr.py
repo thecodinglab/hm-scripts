@@ -4,13 +4,19 @@ import sympy as sp
 from util import backwards_substitution
 
 
+def sign(x: sp.Expr) -> sp.Expr:
+    if x.is_zero:
+        return sp.Number(1)
+    return sp.sign(x)
+
+
 def gen_householder_matrix(a: sp.Matrix, i: int, precision: int = -1, output: bool = False) -> sp.Matrix:
     ai = a[:, 0]
     ei = sp.eye(ai.rows)[:, 0]
 
     ai_norm = sp.sqrt(sum(ai[i] ** 2 for i in range(len(ai))))
 
-    v = ai + sp.sign(ai[0]) * ai_norm * ei
+    v = ai + sign(ai[0]) * ai_norm * ei
     u = v / v.norm()
 
     if precision == -1:
