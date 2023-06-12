@@ -28,17 +28,17 @@ f = sp.lambdify(x, sp_f, 'numpy')
 integral = integrate.quad(f, a, b)
 
 
-def gauss_1_step(f, a, b):
+def gauss_1(f, a, b):
     return (b - a) * f((a + b) / 2)
 
 
-def gauss_2_step(f, a, b):
+def gauss_2(f, a, b):
     w = (a + b) / 2
     t = 1 / np.sqrt(3) * (b - a) / 2
     return (b - a) / 2 * (f(-t + w) + f(t + w))
 
 
-def gauss_3_step(f, a, b):
+def gauss_3(f, a, b):
     w = (a + b) / 2
     t = np.sqrt(0.6) * ((b - a) / 2)
 
@@ -46,9 +46,9 @@ def gauss_3_step(f, a, b):
 
 
 lookup = {
-    1: gauss_1_step,
-    2: gauss_2_step,
-    3: gauss_3_step
+    1: gauss_1,
+    2: gauss_2,
+    3: gauss_3
 }
 
 estimation = lookup[n](f, a, b)
