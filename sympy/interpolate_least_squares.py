@@ -3,7 +3,7 @@ import sympy as sp
 import IPython.display as dp
 import matplotlib.pyplot as plt
 
-def interpolate_least_squares(exponents: list[int], x, y):
+def interpolate_least_squares(exponents: list[int], x, y) -> sp.Expr:
     """
     Interpolates the specified `x` and `y` values by the least squares with the specified `exponents`.
 
@@ -51,8 +51,10 @@ def interpolate_least_squares(exponents: list[int], x, y):
     plt.legend()
     plt.grid()
 
-    dp.display(sp.Poly(lam, sp.Symbol("x")).as_expr())
+    expression = sp.Poly(lam, sp.Symbol("x")).as_expr()
+    dp.display(expression)
 
     err = least_squares(lambda x: np.polyval(lam, x), x, y)
     dp.display(dp.Math(f"\\text{{Error}} = {sp.latex(err)}"))
+    return expression
     
