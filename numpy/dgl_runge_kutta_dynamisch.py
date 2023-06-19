@@ -9,7 +9,8 @@ b = 5
 n = 1
 
 y0 = 1
-f = lambda x, y: x / y
+def f(x, y): return x / y
+
 
 # c_1 | a_11 a_12 ... a_1s
 # c_2 | a_21 a_22 ... a_2s
@@ -47,6 +48,7 @@ for i in range(n):
         y_j = y[-1] + step_size * np.sum(c_a[j, :j] * k[:j])
         k[j] = f(x_j, y_j)
 
+    x.append(x[-1] + step_size)
     y.append(y[-1] + step_size * np.sum(c_b * k))
 
 print(y)
