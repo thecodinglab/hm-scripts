@@ -29,7 +29,7 @@ def generate_splines(t: sp.Symbol, x: sp.Matrix, degree: int) -> Tuple[sp.Expr, 
     return splines, coeffs
 
 
-def build_conditions(splines: List[sp.Expr], t: sp.Symbol, x: sp.Matrix, y: sp.Matrix) -> List[sp.Eq]:
+def build_conditions(splines: List[sp.Expr], t: sp.Symbol, x: sp.Matrix, y: sp.Matrix, cond_type='natural') -> List[sp.Eq]:
     n = x.shape[0]
 
     dp.display(dp.Markdown(f"### Conditions"))
@@ -89,7 +89,7 @@ def build_conditions(splines: List[sp.Expr], t: sp.Symbol, x: sp.Matrix, y: sp.M
         yield res
 
     # natural conditions
-    if True:
+    if cond_type == 'natural':
         dp.display(dp.Markdown(f"#### Natural conditions"))
 
         # S_0''(x_0) = 0
@@ -109,25 +109,55 @@ def build_conditions(splines: List[sp.Expr], t: sp.Symbol, x: sp.Matrix, y: sp.M
         yield res
 
     # periodic conditions
-    if False:
-        # TODO
-        pass
+    if cond_type == 'periodic':
+        dp.display(dp.Markdown(f"#### Periodic conditions"))
+
+        # S_0'(x_0) = S_{n - 1}'(x_n)
+        diff_0 = sp.diff(splines[0], t).subs(t, x[0])
+        diff_n1 = sp.diff(splines[n - 2], t).subs(t, x[n - 1])
+        res = sp.Eq(diff_0, diff_n1)
+
+        dp.display(dp.Math(
+            f"S_{{{0}}}'({x[0]}) = {sp.latex(diff_0)} = {sp.latex(diff_n1)} = S_{{{n - 2}}}'({x[n - 1]}) \\quad \\Rightarrow \\quad {sp.latex(res)}"))
+        yield res
+
+        # S_0''(x_0) = S_{n - 1}''(x_n)
+        diff_0 = sp.diff(splines[0], t, t).subs(t, x[0])
+        diff_n1 = sp.diff(splines[n - 2], t, t).subs(t, x[n - 1])
+        res = sp.Eq(diff_0, diff_n1)
+
+        dp.display(dp.Math(
+            f"S_{{{0}}}'({x[0]}) = {sp.latex(diff_0)} = {sp.latex(diff_n1)} = S_{{{n - 2}}}'({x[n - 1]}) \\quad \\Rightarrow \\quad {sp.latex(res)}"))
+        yield res
+
 
     # not-a-knot conditions
-    if False:
-        # TODO
-        pass
+    if cond_type == 'not-a-knot':
+        dp.display(dp.Markdown(f"#### Not-a-knot conditions"))
+
+        # S_0'''(x_1) = S_1'''(x_1)
+        diff_0 = sp.diff(splines[0], t, t, t).subs(t, x[1])
+        diff_1 = sp.diff(splines[1], t, t, t).subs(t, x[1])
+        res = sp.Eq(diff_0, diff_1)
+
+        dp.display(dp.Math(
+            f"S_{{{0}}}'({x[1]}) = {sp.latex(diff_0)} = {sp.latex(diff_1)} = S_{{{1}}}'({x[1]}) \\quad \\Rightarrow \\quad {sp.latex(res)}"))
+        yield res
 
 
-def spline(data: sp.Matrix, t: sp.Symbol, degree: int, precision: int = 4) -> sp.Expr:
+def spline(data: sp.Matrix, t: sp.Symbol, degree: int, cond_type = 'natural') -> sp.Expr:
     x = data[:, 0]
     y = data[:, 1]
 
     splines, coeffs = generate_splines(t, x, degree)
-    conditions = list(build_conditions(splines, t, x, y))
+    conditions = list(build_conditions(splines, t, x, y, cond_type))
 
     # solve
     sol = sp.solve(conditions, coeffs)
+
+    dp.display(dp.Markdown(f"### Coefficients"))
+    for symbol in coeffs:
+        dp.display(dp.Math(f"{sp.latex(symbol)} = {sp.latex(sol[symbol])}"))
 
     # construct spline
     splines = [splines[i].subs(sol) for i in range(len(splines))]
